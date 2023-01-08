@@ -1,6 +1,9 @@
 from django.shortcuts import render
 
+from .models import Product
 
 def get_index(request):
-    return render(request, 'prostoapp/index.html')
+    products = Product.objects.all()
+    print(products)
+    return render(request, 'prostoapp/index.html', {'products': products})
 

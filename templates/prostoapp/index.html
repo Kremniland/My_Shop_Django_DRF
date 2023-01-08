@@ -9,6 +9,9 @@
     <title>Document</title>
 </head>
 <body>
-    index
+    index <br>
+    {% for product in products %}
+        <image src="{{ product.image.url }}"></image>
+    {% endfor %}
 </body>
 </html>
