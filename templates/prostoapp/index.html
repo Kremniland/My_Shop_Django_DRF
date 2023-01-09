@@ -1,17 +1,44 @@
+{% extends 'prostoapp/base.html' %}
 {% load static %}
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-</head>
-<body>
-    index <br>
-    {% for product in products %}
-        <image src="{{ product.image.url }}"></image>
-    {% endfor %}
-</body>
-</html>
+{% block css %}
+    <link href="{% static 'vendor/css/index.css' %}" rel="stylesheet">
+{% endblock %}
+
+{#{% block content %}#}
+{#    <section>#}
+{#        <!--    <div class="alert alert-light text-center" role="alert">-->#}
+{#        <!--        Информационное сообщение-->#}
+{#        <!--    </div>-->#}
+{#        <div class="container">#}
+{#            <div class="row">#}
+{#                <div class="col-lg-6">#}
+{#                    <h1 class="mt-5">Store</h1>#}
+{#                    <p>#}
+{#                        Новые образы и лучшие бренды на Store.#}
+{#                        Бесплатная доставка по всему миру! Аутлет: до -70% Собственный бренд. -20% новым покупателям.#}
+{#                    </p>#}
+{#                    <button id="start-purchase-btn" type="button" class="btn btn-lg">#}
+{#                        <a id="start-purchase-link" href="{% url 'products:index' %}">#}
+{#                            Начать покупки#}
+{#                        </a>#}
+{#                    </button>#}
+{#                </div>#}
+{#            </div>#}
+{#        </div>#}
+{#    </section>#}
+{#{% endblock %}#}
+
+
+{% block content %}
+    <section>
+        <div class="container">
+            index <br>
+            {% for product in products %}
+                <image src="{{ product.image.url }}"></image>
+                {{ user.id }}
+            {% endfor %}
+        </div>
+    </section>
+{% endblock content %}
+

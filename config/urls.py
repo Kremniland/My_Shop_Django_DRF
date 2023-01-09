@@ -8,7 +8,7 @@ from django.conf import settings # Правильный импорт settings п
 urlpatterns = [
     path('admin/', admin.site.urls),
 
-    path('', include('prostoapp.urls')),
+    path('', include('prostoapp.urls', namespace='prostoapp'), name='prostoapp'),
     path('users/', include('users.urls', namespace='users')),
 ]
 
