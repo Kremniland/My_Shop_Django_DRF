@@ -1,8 +1,9 @@
 from django.shortcuts import render, HttpResponseRedirect
 from django.urls import reverse
 from django.contrib import auth, messages
+from django.contrib.auth.decorators import login_required
 
-
+from basket.models import Basket
 from users.forms import UserLoginForm, UserRegistrationForm, UserProfileForm
 
 
@@ -16,7 +17,7 @@ def login(request):
             user = auth.authenticate(username=username, password=password)
             if user:
                 auth.login(request, user)
-                return HttpResponseRedirect(reverse('prostoapp:home'))
+                return HttpResponseRedirect(reverse('prostoapp:index'))
     else:
         form = UserLoginForm()
     context = {'form': form}
@@ -36,6 +37,7 @@ def registration(request):
     return render(request, 'users/registration.html', context)
 
 
+@login_required # не авторизованного user перенаправит на LOGIN_URL
 def profile(request):
     if request.method == 'POST':
         form = UserProfileForm(
@@ -53,10 +55,11 @@ def profile(request):
 
     context = {
         'form': form,
+        'baskets': Basket.objects.filter(user=request.user),
     }
     return render(request, 'users/profile.html', context)
 
 
 def logout(request):
     auth.logout(request)
-    return HttpResponseRedirect(reverse('prostoapp:home'))
+    return HttpResponseRedirect(reverse('prostoapp:index'))
