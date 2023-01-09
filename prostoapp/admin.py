@@ -11,5 +11,7 @@ class ProductCategoryAdmin(admin.ModelAdmin):
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
     list_display = ['name', 'price', 'quantity', 'category']
-
-
+    fields = ['name', 'description', 'image', ('price', 'quantity'), 'category']
+    # readonly_fields = ['description']
+    search_fields = ['name']
+    ordering = ['name']

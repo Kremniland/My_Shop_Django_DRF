@@ -37,13 +37,13 @@ def registration(request):
     return render(request, 'users/registration.html', context)
 
 
-@login_required # не авторизованного user перенаправит на LOGIN_URL
+@login_required  # не авторизованного user перенаправит на LOGIN_URL
 def profile(request):
     if request.method == 'POST':
         form = UserProfileForm(
             instance=request.user,
             data=request.POST,
-            files=request.FILES # Для сохранения изображения
+            files=request.FILES  # Для сохранения изображения
             )
         if form.is_valid():
             form.save()
