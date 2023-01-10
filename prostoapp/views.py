@@ -3,15 +3,11 @@ from django.core.paginator import Paginator
 from django.views.generic import TemplateView, ListView
 
 from .models import Product, ProductCategory
+from services.services import TitleMixin
 
-
-class IndexView(TemplateView):
+class IndexView(TitleMixin, TemplateView):
     template_name = 'prostoapp/index.html'
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['title'] = 'Главная страница'
-        return context
+    title = 'Главная страница'
 
 
 # def index(request):
@@ -19,14 +15,14 @@ class IndexView(TemplateView):
 #     return render(request, 'prostoapp/index.html', context)
 
 
-class ProductListView(ListView):
+class ProductListView(TitleMixin, ListView):
     model = Product
     template_name = 'prostoapp/products.html'
     paginate_by = 3
+    title = 'Каталог товаров'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['title'] = 'Главная страница'
         context['categories'] = ProductCategory.objects.all()
         return context
 

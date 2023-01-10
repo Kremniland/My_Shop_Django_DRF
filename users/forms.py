@@ -1,9 +1,11 @@
+import uuid
+from datetime import timedelta
+
 from django import forms
-
 from django.contrib.auth.forms import AuthenticationForm, UserCreationForm, UserChangeForm
+from django.utils.timezone import now
 
-from users.models import CustomUser
-
+from users.models import CustomUser,EmailVerification
 
 class UserLoginForm(AuthenticationForm):
     username = forms.CharField(widget=forms.TextInput(attrs={
@@ -29,6 +31,22 @@ class UserRegistrationForm(UserCreationForm):
         'class': 'form-control py-4', 'placeholder': 'Введите пароль'}))
     password2 = forms.CharField(widget=forms.PasswordInput(attrs={
         'class': 'form-control py-4', 'placeholder': 'Подтвердите пароль'}))
+
+    def save(self, commit=True):
+        '''Создается объект EmailVerification при создании нового пользователя
+            и отправляем на него ссылку подтверждения'''
+        user = super(UserRegistrationForm, self).save(commit=True)
+        # время жизни ссылки
+        expiration = now() + timedelta(hours=48)
+        # формируем и записываем объект EmailVerification
+        record = EmailVerification.objects.create(
+            code=uuid.uuid4(),
+            user=user,
+            expiration=expiration
+        )
+        # Вызываем метод прописанный в модели для отправки email
+        record.send_verification_mail()
+        return user
 
     class Meta:
         model = CustomUser

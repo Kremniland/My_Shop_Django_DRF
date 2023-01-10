@@ -2,17 +2,39 @@ from django.contrib.auth.views import LoginView
 from django.shortcuts import render, HttpResponseRedirect
 from django.urls import reverse, reverse_lazy
 from django.contrib import auth, messages
+from django.contrib. messages.views import SuccessMessageMixin
 from django.contrib.auth.decorators import login_required
-from django.views.generic import CreateView, UpdateView
+from django.views.generic import CreateView, UpdateView, TemplateView
 
 from basket.models import Basket
 from users.forms import UserLoginForm, UserRegistrationForm, UserProfileForm
-from .models import CustomUser
+from .models import CustomUser, EmailVerification
+from services.services import TitleMixin
 
 
-class UserLoginView(LoginView):
+class EmailVerificationView(TitleMixin, TemplateView):
+    title = 'Подтверждение email'
+    template_name = 'users/email_verification.html'
+
+    def get(self, request, *args, **kwargs):
+        '''берем данные из гет запроса при переходе юзера по ссылке'''
+        code = kwargs['code']
+        user = CustomUser.objects.get(email=kwargs['email'])
+        email_verifications = EmailVerification.objects.filter(user=user, code=code)
+        # если список не пустой и время жизни ссылки не истекло то верифицируем юзера
+        if email_verifications.exists() and not email_verifications.first().is_expired():
+            user.is_verified_email = True
+            user.save()
+            # обязательно вернуть так или не отработает шаблон
+            return super(EmailVerificationView, self).get(request, *args, **kwargs)
+        else:
+            return HttpResponseRedirect(reverse('index'))
+
+
+class UserLoginView(TitleMixin, LoginView):
     template_name = 'users/login.html'
     form_class = UserLoginForm
+    title = 'Авторизация'
 
 
 # def login(request):
@@ -32,16 +54,13 @@ class UserLoginView(LoginView):
 #     return render(request, 'users/login.html', context)
 
 
-class UserRegistrationView(CreateView):
+class UserRegistrationView(TitleMixin, SuccessMessageMixin, CreateView):
     model = CustomUser
     form_class = UserRegistrationForm
     template_name = 'users/registration.html'
     success_url = reverse_lazy('users:login')
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data()
-        context['title'] = 'Регистрация'
-        return context
+    success_message = 'Успешная регистрация!'
+    title = 'Регистрация'
 
 
 # def registration(request):
@@ -57,18 +76,18 @@ class UserRegistrationView(CreateView):
 #     return render(request, 'users/registration.html', context)
 
 
-class UserProfileView(UpdateView):
+class UserProfileView(TitleMixin, UpdateView):
     '''login_required вешаем на url'''
     model = CustomUser
     form_class = UserProfileForm
     template_name ='users/profile.html'
+    title = 'Личный кабинет'
 
     def get_success_url(self):
         return reverse_lazy('users:profile', args=(self.object.id,))
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data()
-        context['title'] = 'Профиль'
         context['baskets'] = Basket.objects.filter(user=self.object)
         return context
 

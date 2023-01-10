@@ -14,6 +14,10 @@ from pathlib import Path
 
 import os
 
+from dotenv import load_dotenv
+
+load_dotenv()
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -34,6 +38,7 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
+DOMAIN_NAME = 'http://127.0.0.1:8000'
 
 # Application definition
 
@@ -141,4 +146,8 @@ MEDIA_ROOT = BASE_DIR / 'media'
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# email
+KEY_MAIL = os.getenv('KEY_MAIL')
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend' # для отправки в консоль
 
