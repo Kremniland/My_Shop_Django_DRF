@@ -30,6 +30,7 @@
         <option value="$MODULE_DIR$/templates" />
         <option value="$MODULE_DIR$/users/templates" />
         <option value="$MODULE_DIR$/basket/templates" />
+        <option value="$MODULE_DIR$/prostoapp/templates" />
       </list>
     </option>
   </component>
