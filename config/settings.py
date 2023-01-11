@@ -89,7 +89,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'config.wsgi.application'
 
-
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 
@@ -99,7 +98,6 @@ DATABASES = {
         'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/4.1/ref/settings/#auth-password-validators
@@ -119,7 +117,6 @@ AUTH_PASSWORD_VALIDATORS = [
     # },
 ]
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/4.1/topics/i18n/
 
@@ -130,7 +127,6 @@ TIME_ZONE = 'UTC'
 USE_I18N = True
 
 USE_TZ = True
-
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.1/howto/static-files/
@@ -148,6 +144,12 @@ MEDIA_ROOT = BASE_DIR / 'media'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # email
-KEY_MAIL = os.getenv('KEY_MAIL')
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend' # для отправки в консоль
-
+KEY_EMAIL = os.getenv('KEY_EMAIL')
+print(KEY_EMAIL)
+# EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend' # для отправки в консоль
+EMAIL_HOST = 'smtp.mail.ru'
+EMAIL_PORT = 465
+EMAIL_HOST_USER = 'chausovo@mail.ru'  # Почта отправителя
+EMAIL_HOST_PASSWORD = KEY_EMAIL  # Пароль для внешнего приложения
+EMAIL_USE_TLS = False  # Шифрование TSL
+EMAIL_USE_SSL = True  # Шифрование SSL
