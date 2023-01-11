@@ -14,6 +14,8 @@ urlpatterns = [
 
     path('products/', include('prostoapp.urls', namespace='prostoapp')),
     path('users/', include('users.urls', namespace='users')),
+
+    path('accounts/', include('allauth.urls')),
 ]
 
 if settings.DEBUG == True:

@@ -50,6 +50,13 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
+    'django.contrib.sites',
+
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+    'allauth.socialaccount.providers.github',
+
     'prostoapp',
     'users',
     'basket',
@@ -82,6 +89,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+
                 # context processors basket позволит использовать basket глобально
                 'services.context_processors.baskets',
             ],
@@ -94,10 +102,21 @@ WSGI_APPLICATION = 'config.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': BASE_DIR / 'db.sqlite3',
+#     }
+# }
+
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': 'testproject',
+        'USER': 'postgres',
+        'PASSWORD': '1',
+        'HOST': '127.0.0.1',
+        'PORT': '5432',
     }
 }
 
@@ -148,10 +167,33 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # email
 KEY_EMAIL = os.getenv('KEY_EMAIL')
 print(KEY_EMAIL)
-# EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend' # для отправки в консоль
-EMAIL_HOST = 'smtp.mail.ru'
-EMAIL_PORT = 465
-EMAIL_HOST_USER = 'chausovo@mail.ru'  # Почта отправителя
-EMAIL_HOST_PASSWORD = KEY_EMAIL  # Пароль для внешнего приложения
-EMAIL_USE_TLS = False  # Шифрование TSL
-EMAIL_USE_SSL = True  # Шифрование SSL
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend' # для отправки в консоль
+# EMAIL_HOST = 'smtp.mail.ru'
+# EMAIL_PORT = 465
+# EMAIL_HOST_USER = 'chausovo@mail.ru'  # Почта отправителя
+# EMAIL_HOST_PASSWORD = KEY_EMAIL  # Пароль для внешнего приложения
+# EMAIL_USE_TLS = False  # Шифрование TSL
+# EMAIL_USE_SSL = True  # Шифрование SSL
+
+# OAuth
+
+AUTHENTICATION_BACKENDS = [
+    # Needed to login by username in Django admin, regardless of `allauth`
+    'django.contrib.auth.backends.ModelBackend',
+    # `allauth` specific authentication methods, such as login by e-mail
+    'allauth.account.auth_backends.AuthenticationBackend',
+]
+
+SITE_ID = 1
+
+# Provider specific settings
+SOCIALACCOUNT_PROVIDERS = {
+    'github': {
+        'SCOPE': [
+            'user',
+            'repo',
+            'read:org',
+        ],
+    }
+}
+
