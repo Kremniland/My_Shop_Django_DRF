@@ -86,10 +86,11 @@ class UserProfileView(TitleMixin, UpdateView):
     def get_success_url(self):
         return reverse_lazy('users:profile', args=(self.object.id,))
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data()
-        context['baskets'] = Basket.objects.filter(user=self.object)
-        return context
+    # закомментировали потому что корзина стала доступна глобально из-за контектного
+    # def get_context_data(self, **kwargs):
+    #     context = super().get_context_data()
+    #     context['baskets'] = Basket.objects.filter(user=self.object)
+    #     return context
 
 
 # @login_required  # не авторизованного user перенаправит на LOGIN_URL
