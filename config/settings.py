@@ -56,6 +56,7 @@ INSTALLED_APPS = [
     'allauth.account',
     'allauth.socialaccount',
     'allauth.socialaccount.providers.github',
+    'debug_toolbar',
 
     'prostoapp',
     'users',
@@ -70,6 +71,8 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+
+    'debug_toolbar.middleware.DebugToolbarMiddleware',
 
     'config.middleware.MyMiddleware.IPMiddleware',
 ]
@@ -197,3 +200,6 @@ SOCIALACCOUNT_PROVIDERS = {
     }
 }
 
+INTERNAL_IPS = [
+    '127.0.0.1',
+]
