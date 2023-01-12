@@ -8,7 +8,8 @@ from django.views.decorators.cache import cache_page
 app_name = 'prostoapp'
 
 urlpatterns = [
-    path('',   cache_page(30)(ProductListView.as_view()), name='index'),
+    # path('',   cache_page(30)(ProductListView.as_view()), name='index'),
+    path('', ProductListView.as_view(), name='index'),
     path('category/<int:category_id>/', ProductListView.as_view(), name='category'),
     path('page/<int:page>/', ProductListView.as_view(), name='paginator'),
 

@@ -24,17 +24,17 @@ class ProductListView(TitleMixin, ListView):
     title = 'Каталог товаров'
 
     def get_context_data(self, **kwargs):
-        '''помещаем данные категорий в кэш'''
+        # '''помещаем данные категорий в кэш'''
         context = super().get_context_data(**kwargs)
-        categories = cache.get('categories') # проверяем есть ли данные категорий в кэше
-        if not categories: # если в кэше нет категорий
-            context['categories'] = ProductCategory.objects.all()
-            # помещаем категории в кэш 1 - ключ, 2 - значение, 3 - время кэша
-            cache.set('categories', context['categories'], 30)
-        else:
-            # если данные категорий в кэше то берем их оттуда по ключу
-            context['categories'] = categories
-        # context['categories'] = ProductCategory.objects.all()
+        # categories = cache.get('categories') # проверяем есть ли данные категорий в кэше
+        # if not categories: # если в кэше нет категорий
+        #     context['categories'] = ProductCategory.objects.all()
+        #     # помещаем категории в кэш 1 - ключ, 2 - значение, 3 - время кэша
+        #     cache.set('categories', context['categories'], 30)
+        # else:
+        #     # если данные категорий в кэше то берем их оттуда по ключу
+        #     context['categories'] = categories
+        context['categories'] = ProductCategory.objects.all()
         return context
 
     def get_queryset(self):

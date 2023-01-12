@@ -59,9 +59,11 @@ INSTALLED_APPS = [
     'debug_toolbar',
     'redis',
 
+
     'prostoapp',
     'users',
     'basket',
+    'orders',
 ]
 
 MIDDLEWARE = [
@@ -178,13 +180,13 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # email
 KEY_EMAIL = os.getenv('KEY_EMAIL')
 # print(KEY_EMAIL)
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'  # для отправки в консоль
-# EMAIL_HOST = 'smtp.mail.ru'
-# EMAIL_PORT = 465
-# EMAIL_HOST_USER = 'chausovo@mail.ru'  # Почта отправителя
-# EMAIL_HOST_PASSWORD = KEY_EMAIL  # Пароль для внешнего приложения
-# EMAIL_USE_TLS = False  # Шифрование TSL
-# EMAIL_USE_SSL = True  # Шифрование SSL
+# EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'  # для отправки в консоль
+EMAIL_HOST = 'smtp.mail.ru'
+EMAIL_PORT = 465
+EMAIL_HOST_USER = 'chausovo@mail.ru'  # Почта отправителя
+EMAIL_HOST_PASSWORD = KEY_EMAIL  # Пароль для внешнего приложения
+EMAIL_USE_TLS = False  # Шифрование TSL
+EMAIL_USE_SSL = True  # Шифрование SSL
 
 # OAuth
 
@@ -211,3 +213,9 @@ SOCIALACCOUNT_PROVIDERS = {
 INTERNAL_IPS = [
     '127.0.0.1',
 ]
+
+# Celery
+
+CELERY_BROKER_URL = 'redis://127.0.0.1:6379'
+CELERY_RESULT_BACKEND = 'redis://127.0.0.1:6379'
+
