@@ -57,6 +57,7 @@ INSTALLED_APPS = [
     'allauth.socialaccount',
     'allauth.socialaccount.providers.github',
     'debug_toolbar',
+    'redis',
 
     'prostoapp',
     'users',
@@ -74,7 +75,7 @@ MIDDLEWARE = [
 
     'debug_toolbar.middleware.DebugToolbarMiddleware',
 
-    'config.middleware.MyMiddleware.IPMiddleware',
+    'services.middleware.MyMiddleware.IPMiddleware',
 ]
 
 ROOT_URLCONF = 'config.urls'
@@ -111,6 +112,13 @@ WSGI_APPLICATION = 'config.wsgi.application'
 #         'NAME': BASE_DIR / 'db.sqlite3',
 #     }
 # }
+
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.redis.RedisCache',
+        'LOCATION': 'redis://127.0.0.1:6379',
+    }
+}
 
 DATABASES = {
     'default': {
@@ -169,8 +177,8 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # email
 KEY_EMAIL = os.getenv('KEY_EMAIL')
-print(KEY_EMAIL)
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend' # для отправки в консоль
+# print(KEY_EMAIL)
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'  # для отправки в консоль
 # EMAIL_HOST = 'smtp.mail.ru'
 # EMAIL_PORT = 465
 # EMAIL_HOST_USER = 'chausovo@mail.ru'  # Почта отправителя
