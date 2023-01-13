@@ -37,17 +37,17 @@ class UserRegistrationForm(UserCreationForm):
         '''Создается объект EmailVerification при создании нового пользователя
             и отправляем на него ссылку подтверждения'''
         user = super(UserRegistrationForm, self).save(commit=True)
-        send_email_verification.delay(user.id) # делаем через Celery
-        # # время жизни ссылки
-        # expiration = now() + timedelta(hours=48)
-        # # формируем и записываем объект EmailVerification
-        # record = EmailVerification.objects.create(
-        #     code=uuid.uuid4(),
-        #     user=user,
-        #     expiration=expiration
-        # )
-        # # Вызываем метод прописанный в модели для отправки email
-        # record.send_verification_mail()
+        # send_email_verification.delay(user.id) # делаем через Celery
+        # время жизни ссылки
+        expiration = now() + timedelta(hours=48)
+        # формируем и записываем объект EmailVerification
+        record = EmailVerification.objects.create(
+            code=uuid.uuid4(),
+            user=user,
+            expiration=expiration
+        )
+        # Вызываем метод прописанный в модели для отправки email
+        record.send_verification_mail()
         return user
 
     class Meta:
