@@ -3,7 +3,7 @@ from http import HTTPStatus
 
 from django.http import HttpResponseRedirect, HttpResponse
 from django.views.decorators.csrf import csrf_exempt
-from django.views.generic.edit import CreateView
+from django.views.generic import CreateView, ListView, DetailView
 from django.views.generic.base import TemplateView
 from django.urls import reverse, reverse_lazy
 from django.conf import settings
@@ -14,6 +14,27 @@ from basket.models import Basket
 from orders.models import Oreders
 
 stripe.api_key = settings.STRIPE_SECRET_KEY
+
+
+class OrderDetailView(DetailView):
+    template_name = 'orders/order.html'
+    model = Oreders
+
+    def get_context_data(self, **kwargs):
+        context = super(OrderDetailView, self).get_context_data(**kwargs)
+        context['title'] = f'Store - Заказ #{self.object.id}'
+        return context
+
+
+class OrderListView(TitleMixin, ListView):
+    template_name = 'orders/orders.html'
+    title = 'Заказы'
+    queryset = Oreders.objects.all()
+    ordering = ('-created')
+
+    def get_queryset(self):
+        queryset = super(OrderListView, self).get_queryset()
+        return queryset.filter(initiator=self.request.user)
 
 
 class SuccessTemplateView(TitleMixin, TemplateView):
