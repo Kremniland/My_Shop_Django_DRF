@@ -59,6 +59,10 @@ INSTALLED_APPS = [
     'allauth.socialaccount.providers.github',
     'debug_toolbar',
     'redis',
+    'rest_framework',
+    'drf_yasg',
+    'rest_framework.authtoken',
+    'djoser',
 
 
     'prostoapp',
@@ -226,5 +230,25 @@ STRIPE_PUBLIC_KEY = os.getenv('STRIPE_PUBLIC_KEY')
 STRIPE_SECRET_KEY = os.getenv('STRIPE_SECRET_KEY')
 # print(STRIPE_SECRET_KEY, STRIPE_PUBLIC_KEY)
 STRIPE_WEBHOOK_SECRET = 'mwhsec_58db2951e44bc78d5e1e3e58a4a739571f13a879af252d10b3a67c61919b81a5'
+
+REST_FRAMEWORK = {
+    'DEFAULT_PERMISSION_CLASSES': ( # Кто имеет доступ
+        'rest_framework.permissions.IsAdminUser', # Администратор
+        'rest_framework.permissions.AllowAny', # Все
+    ),
+    'PAGE_SIZE': 10, # Пагинация
+    'DEFAULT_AUTHENTICATION_CLASSES': [ # Аутентификация
+        # 'rest_framework_jwt.authentication.JSONWebTokenAuthentication', # Для JWT регистрации
+        'rest_framework.authentication.TokenAuthentication', # по токену Для Djoser
+        'rest_framework.authentication.BasicAuthentication', # Базовая
+        'rest_framework.authentication.SessionAuthentication' # Для session, например что бы зайти в админку
+    ],
+    # Настройка рендера для отправки на фронт и получение на бэк в JSON
+    # 'DEFAULT_RENDERER_CLASSES': (
+    #     'rest_framework_json_api.renderers.JSONRenderer',
+    #     'rest_framework.renderers.BrowsableAPIRenderer',
+    # ),
+    # 'DEFAULT_METADATA_CLASS': 'rest_framework_json_api.metadata.JSONAPIMetadata',
+}
 
 
