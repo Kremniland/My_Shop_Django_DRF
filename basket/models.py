@@ -40,6 +40,16 @@ class Basket(models.Model):
     def sum(self):
         return self.product.price * self.quantity
 
+    def de_json(self):
+        '''возвращает словарь с данными о корзине'''
+        basket_item = {
+            'product_name': self.product.name,
+            'quantity': self.quantity,
+            'price': float(self.product.price),
+            'sum': float(self.sum()),
+        }
+        return basket_item
+
     class Meta:
         db_table = 'Basket'
         verbose_name = 'Корзина'

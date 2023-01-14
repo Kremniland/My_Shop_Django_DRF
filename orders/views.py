@@ -11,6 +11,7 @@ from django.conf import settings
 from orders.forms import OrderForm
 from services.services import TitleMixin
 from basket.models import Basket
+from orders.models import Oreders
 
 stripe.api_key = settings.STRIPE_SECRET_KEY
 
@@ -89,9 +90,8 @@ def stripe_webhook_view(request):
     # Passed signature verification
     return HttpResponse(status=200)
 
-
+# не переходит в эту ф-ию!!!!!!!!!!!!!!!!!
 def fulfill_order(session):
-    # TODO: fill me in
     order_id = int(session.metadata.order_id)
-    print("Fulfilling order")
-
+    order = Oreders.objects.get(id=order_id)
+    order.update_after_payment()
