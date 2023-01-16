@@ -5,16 +5,20 @@ from basket.models import Basket
 from prostoapp.models import Product, ProductCategory
 
 
-class CategorySerializer(serializers.Serializer):
-    name = serializers.CharField(max_length=128)
-    description = serializers.CharField()
+class CategorySerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = ProductCategory
+        fields = ('id', 'name', 'description',)
 
 
 class ProductSerializer(serializers.ModelSerializer):
 
+    category_name = serializers.CharField(source='category')
+
     class Meta:
         model = Product
-        fields = ('name', 'price', 'category',)
+        fields = ('name', 'price','quantity', 'category_name',)
 
 
 # class BasketSerializer(serializers.ModelSerializer):
@@ -28,5 +32,5 @@ class CustomUserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = CustomUser
-        fields = ('id', 'username', 'first_name', 'last_name', 'email', 'is_verified_email', 'image', 'basket')
+        fields = ('id', 'username', 'first_name', 'last_name', 'email', 'is_verified_email', 'image',)
 
