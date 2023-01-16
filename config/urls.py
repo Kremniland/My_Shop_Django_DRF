@@ -42,6 +42,8 @@ urlpatterns = [
     path('accounts/', include('allauth.urls')),
     path('orders/', include('orders.urls', namespace='orders')),
 
+    path('api/v1/', include('api_app.urls', namespace='api_app')),
+
     path('webhook/stripe/', stripe_webhook_view, name='stripe_webhook'),
 ]
 

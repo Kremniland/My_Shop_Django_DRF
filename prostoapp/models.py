@@ -24,7 +24,7 @@ class Product(models.Model):
     quantity = models.PositiveIntegerField(default=0, verbose_name='Наличие')
     image = models.ImageField(upload_to='products_images', verbose_name='Картинка')
     stripe_product_price_id = models.CharField(max_length=128, null=True, blank=True)
-    category = models.ForeignKey(to=ProductCategory, on_delete=models.CASCADE, verbose_name='Категория')
+    category = models.ForeignKey(to=ProductCategory, on_delete=models.CASCADE, verbose_name='Категория', related_name='product')
 
     class Meta:
         verbose_name = 'Продукт'

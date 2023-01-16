@@ -233,7 +233,7 @@ STRIPE_WEBHOOK_SECRET = 'mwhsec_58db2951e44bc78d5e1e3e58a4a739571f13a879af252d10
 
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': ( # Кто имеет доступ
-        'rest_framework.permissions.IsAdminUser', # Администратор
+        # 'rest_framework.permissions.IsAdminUser', # Администратор
         'rest_framework.permissions.AllowAny', # Все
     ),
     'PAGE_SIZE': 10, # Пагинация
@@ -249,6 +249,20 @@ REST_FRAMEWORK = {
     #     'rest_framework.renderers.BrowsableAPIRenderer',
     # ),
     # 'DEFAULT_METADATA_CLASS': 'rest_framework_json_api.metadata.JSONAPIMetadata',
+}
+
+# Для вывода ORM запросов в консоль
+LOGGING = {
+    'version': 1,
+    'handlers': {
+        'console': {'class': 'logging.StreamHandler'},
+    },
+    'loggers': {
+        'django.db.backends': {
+            'handlers': ['console'],
+            'level': 'DEBUG'
+            }
+        }
 }
 
 

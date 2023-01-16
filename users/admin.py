@@ -6,7 +6,8 @@ from basket.admin import BasketAdmin
 
 @admin.register(CustomUser)
 class UserAdmin(admin.ModelAdmin):
-    list_display = ['username', 'is_verified_email']
+    list_display = ['pk', 'username', 'is_verified_email']
+    list_display_links = ('username',)
     inlines = [BasketAdmin]
 
 

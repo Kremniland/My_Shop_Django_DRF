@@ -27,7 +27,7 @@ class BasketQuerySet(models.QuerySet):
 
 
 class Basket(models.Model):
-    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='basket')
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     quantity = models.PositiveIntegerField(default=0)
     create_timestamp = models.DateTimeField(auto_now_add=True)
@@ -43,6 +43,7 @@ class Basket(models.Model):
     def de_json(self):
         '''возвращает словарь с данными о корзине'''
         basket_item = {
+            # 'product': self.product,
             'product_name': self.product.name,
             'quantity': self.quantity,
             'price': float(self.product.price),
