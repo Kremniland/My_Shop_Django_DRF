@@ -11,8 +11,17 @@ from api_app.serializers import CustomUserSerializer, CategorySerializer, Produc
 
 
 class ProductViewSet(ModelViewSet):
-    queryset = Product.objects.all().select_related('category')
+    # queryset = Product.objects.all().select_related('category')
     serializer_class = ProductSerializer
+
+    def get_queryset(self):
+        '''при переопределении get_queryset в ModelViewSet случае пропадет вывод
+        отдельного продукта поэтому переопределяем вывод по pk'''
+        pk = self.kwargs.get('pk')
+        if not pk:
+            return Product.objects.all().select_related('category')
+        # должны вернуть список поэтому не get а filter
+        return Product.objects.filter(pk=pk)
 
     @action(methods=['get'], detail=False)
     def categories(self, request):
@@ -33,7 +42,6 @@ class CategoryViewSet(ModelViewSet):
     queryset = ProductCategory.objects.all()
     serializer_class = CategorySerializer
 
-
     def get_permissions(self):
         '''просматривать могут все а редактировать только админ'''
         if self.action == 'list' or self.action=='retrieve':
@@ -45,7 +53,7 @@ class CategoryViewSet(ModelViewSet):
 
 class UserViewSet(ModelViewSet):
     '''получение списка User, добавление, редактирование и удаление для администратора'''
-    queryset = CustomUser.objects.all().order_by('id')#.prefetch_related('basket')
+    queryset = CustomUser.objects.all().order_by('id').prefetch_related('basket')
     serializer_class = CustomUserSerializer
     permission_classes = (IsAdminUser,)
 
