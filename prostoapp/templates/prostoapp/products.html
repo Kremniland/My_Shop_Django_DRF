@@ -1,5 +1,5 @@
 {% extends 'prostoapp/base.html' %}
-{% load static %}
+{% load static cache humanize %}
 
 {% block css %}
     <link href="{% static 'vendor/css/products.css' %}" rel="stylesheet">
@@ -12,7 +12,7 @@
 
             <div class="col-lg-3">
 
-                <h1 class="my-4">Store</h1>
+                <h1 class="my-4">Магазин электронники</h1>
                 <div class="list-group">
                     {% for category in categories %}
                         <a href="{% url 'prostoapp:category' category.id %}" class="list-group-item">
@@ -22,7 +22,6 @@
                 </div>
 
             </div>
-            <!-- /.col-lg-3 -->
 
             <div class="col-lg-9">
 
@@ -34,15 +33,15 @@
                     </ol>
                     <div class="carousel-inner" role="listbox">
                         <div class="carousel-item active">
-                            <img class="d-block img-fluid" src="/static/vendor/img/slides/slide-1.jpg"
+                            <img class="d-block img-fluid" src="/static/vendor/img/slides/slide-4.jpg"
                                  alt="First slide">
                         </div>
                         <div class="carousel-item">
-                            <img class="d-block img-fluid" src="/static/vendor/img/slides/slide-2.jpg"
+                            <img class="d-block img-fluid" src="/static/vendor/img/slides/slide-4.jpg"
                                  alt="Second slide">
                         </div>
                         <div class="carousel-item">
-                            <img class="d-block img-fluid" src="/static/vendor/img/slides/slide-3.jpg"
+                            <img class="d-block img-fluid" src="/static/vendor/img/slides/slide-4.jpg"
                                  alt="Third slide">
                         </div>
                     </div>
@@ -57,8 +56,8 @@
                 </div>
 
                 <div class="row">
-
-                    {% for product in products %}
+{#                {% cache 30 object_list %}#}
+                    {% for product in object_list %}
                         <div class="col-lg-4 col-md-6 mb-4">
                             <div class="card h-100">
                                 <a href="#">
@@ -70,7 +69,7 @@
                                     <h4 class="card-title">
                                         <a href="#">{{ product.name }}</a>
                                     </h4>
-                                    <h5>{{ product.price }} руб.</h5>
+                                    <h5>{{ product.price|intcomma }} руб.</h5>
                                     <p class="card-text">{{ product.description }}</p>
                                 </div>
                                 <div class="card-footer text-center">
@@ -82,34 +81,34 @@
                             </div>
                         </div>
                     {% endfor %}
-
+{#                {% endcache %}#}
                 </div>
-
-                <nav aria-label="Page navigation example">
-                    <ul class="pagination justify-content-center">
-                        <li class="page-item {% if not products.has_previous %} disabled {% endif %}">
-                            <a class="page-link"
-                               href="{% if products.has_previous %} {% url 'prostoapp:paginator' products.previous_page_number %} {% else %} # {% endif %}"
-                               tabindex="-1" aria-disabled="true">
-                                Предыдущая
-                            </a>
-                        </li>
-                        {% for page in products.paginator.page_range %}
-                            <li class="page-item">
-                                <a class="page-link" href="{% url 'prostoapp:paginator' page %}">
-                                    {{ page }}
+            {% if is_paginated %}
+                    <nav aria-label="Page navigation example">
+                        <ul class="pagination justify-content-center">
+                            <li class="page-item {% if not page_obj.has_previous %} disabled {% endif %}">
+                                <a class="page-link"
+                                   href="{% if page_obj.has_previous %} {% url 'prostoapp:paginator' page_obj.previous_page_number %} {% else %} # {% endif %}"
+                                   tabindex="-1" aria-disabled="true">
+                                    Предыдущая
                                 </a>
                             </li>
-                        {% endfor %}
-                        <li class="page-item {% if not products.has_next %} disabled {% endif %}">
-                            <a class="page-link"
-                               href="{% if products.has_next %} {% url 'prostoapp:paginator' products.next_page_number %} {% else %} # {% endif %}">
-                                Следующая
-                            </a>
-                        </li>
-                    </ul>
-                </nav>
-
+                            {% for page in paginator.page_range %}
+                                <li class="page-item">
+                                    <a class="page-link" href="{% url 'prostoapp:paginator' page %}">
+                                        {{ page }}
+                                    </a>
+                                </li>
+                            {% endfor %}
+                            <li class="page-item {% if not page_obj.has_next %} disabled {% endif %}">
+                                <a class="page-link"
+                                   href="{% if page_obj.has_next %} {% url 'prostoapp:paginator' page_obj.next_page_number %} {% else %} # {% endif %}">
+                                    Следующая
+                                </a>
+                            </li>
+                        </ul>
+                    </nav>
+            {% endif %}
             </div>
 
         </div>
@@ -120,7 +119,7 @@
 {% block footer %}
     <footer class="py-5 bg-dark">
         <div class="container">
-            <p class="m-0 text-center text-white">Copyright &copy; Store 2022</p>
+            <p class="m-0 text-center text-white">Copyright &copy; 2022</p>
         </div>
     </footer>
 {% endblock %}

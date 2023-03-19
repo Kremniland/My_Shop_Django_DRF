@@ -14,25 +14,61 @@ from pathlib import Path
 
 import os
 
+# from dotenv import load_dotenv
+# load_dotenv()
+
+import environ
+
+env = environ.Env(
+    # set casting, default value
+    DEBUG=(bool),
+    SECRET_KEY=(str),
+    DOMAIN_NAME=(str),
+
+    REDIS_HOST=(str),
+    REDIS_PORT=(str),
+
+    DATABASE_NAME=(str),
+    DATABASE_USER=(str),
+    DATABASE_PASSWORD=(str),
+    DATABASE_HOST=(str),
+    DATABASE_PORT=(str),
+
+    EMAIL_HOST=(str),
+    EMAIL_PORT=(int),
+    EMAIL_HOST_USER=(str),
+    EMAIL_HOST_PASSWORD=(str),
+    EMAIL_USE_TLS=(bool),
+    EMAIL_USE_SSL=(bool),
+
+    STRIPE_WEBHOOK_SECRET=(str),
+    STRIPE_PUBLIC_KEY=(str),
+    STRIPE_SECRET_KEY=(str),
+)
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+environ.Env.read_env(BASE_DIR / '.env')
 
 # Users
 AUTH_USER_MODEL = 'users.CustomUser'
 LOGIN_URL = '/users/login/'
-
+LOGIN_REDIRECT_URL = '/'
+LOGOUT_REDIRECT_URL = '/'
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-izf%i=7&ul(c2e@9xj_cprf@kv#rz7-@nulzieyrr=(=yu+f=y'
+SECRET_KEY = env('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = env('DEBUG')
 
 ALLOWED_HOSTS = []
 
+DOMAIN_NAME = env('DOMAIN_NAME')
 
 # Application definition
 
@@ -44,9 +80,26 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
+    'django.contrib.sites', # для кеширования
+    'django.contrib.humanize', # Для использования тега intcomma в шаблонах для красивого отображения сумм
+    
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+    'allauth.socialaccount.providers.github',
+    'debug_toolbar',
+    'redis',
+    'rest_framework',
+    'drf_yasg',
+    'rest_framework.authtoken',
+    'djoser',
+    'django_extensions',
+
+
     'prostoapp',
     'users',
     'basket',
+    'orders',
 ]
 
 MIDDLEWARE = [
@@ -58,7 +111,9 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 
-    'config.middleware.MyMiddleware.IPMiddleware',
+    'debug_toolbar.middleware.DebugToolbarMiddleware',
+
+    'services.middleware.MyMiddleware.IPMiddleware',
 ]
 
 ROOT_URLCONF = 'config.urls'
@@ -76,6 +131,9 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+
+                # context processors basket позволит использовать basket глобально
+                'services.context_processors.baskets',
             ],
         },
     },
@@ -83,17 +141,40 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'config.wsgi.application'
 
-
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 
-DATABASES = {
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': BASE_DIR / 'db.sqlite3',
+#     }
+# }
+
+# Redis
+
+REDIS_HOST = env('REDIS_HOST')
+REDIS_PORT = env('REDIS_PORT')
+
+# Caches
+
+CACHES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'BACKEND': 'django.core.cache.backends.redis.RedisCache',
+        'LOCATION': f'redis://{REDIS_HOST}:{REDIS_PORT}',
     }
 }
 
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': env('DATABASE_NAME'),
+        'USER': env('DATABASE_USER'),
+        'PASSWORD': env('DATABASE_PASSWORD'),
+        'HOST': env('DATABASE_HOST'),
+        'PORT': env('DATABASE_PORT'),
+    }
+}
 
 # Password validation
 # https://docs.djangoproject.com/en/4.1/ref/settings/#auth-password-validators
@@ -113,7 +194,6 @@ AUTH_PASSWORD_VALIDATORS = [
     # },
 ]
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/4.1/topics/i18n/
 
@@ -124,7 +204,6 @@ TIME_ZONE = 'UTC'
 USE_I18N = True
 
 USE_TZ = True
-
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.1/howto/static-files/
@@ -140,4 +219,89 @@ MEDIA_ROOT = BASE_DIR / 'media'
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+if DEBUG:
+    EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'  # для отправки в консоль
+else:
+    EMAIL_HOST = env('EMAIL_HOST')
+    EMAIL_PORT = env('EMAIL_PORT')
+    EMAIL_HOST_USER = env('EMAIL_HOST_USER')  # Почта отправителя
+    EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD')  # Пароль для внешнего приложения
+    EMAIL_USE_TLS = env('EMAIL_USE_TLS')  # Шифрование TSL
+    EMAIL_USE_SSL = env('EMAIL_USE_SSL')  # Шифрование SSL
+
+# OAuth
+
+AUTHENTICATION_BACKENDS = [
+    # Needed to login by username in Django admin, regardless of `allauth`
+    'django.contrib.auth.backends.ModelBackend',
+    # `allauth` specific authentication methods, such as login by e-mail
+    'allauth.account.auth_backends.AuthenticationBackend',
+]
+
+SITE_ID = 1
+
+# Provider specific settings
+SOCIALACCOUNT_PROVIDERS = {
+    'github': {
+        'SCOPE': [
+            'user',
+            'repo',
+            'read:org',
+        ],
+    }
+}
+
+INTERNAL_IPS = [
+    '127.0.0.1',
+]
+
+# Celery
+
+CELERY_BROKER_URL = f'redis://{REDIS_HOST}:{REDIS_PORT}'
+CELERY_RESULT_BACKEND = f'redis://{REDIS_HOST}:{REDIS_PORT}'
+
+# Stripe
+
+# print(STRIPE_SECRET_KEY, STRIPE_PUBLIC_KEY)
+STRIPE_WEBHOOK_SECRET = env('STRIPE_WEBHOOK_SECRET')
+STRIPE_PUBLIC_KEY = env('STRIPE_PUBLIC_KEY')
+STRIPE_SECRET_KEY = env('STRIPE_SECRET_KEY')
+
+REST_FRAMEWORK = {
+    'DEFAULT_PERMISSION_CLASSES': ( # Кто имеет доступ
+        # 'rest_framework.permissions.IsAdminUser', # Администратор
+        'rest_framework.permissions.AllowAny', # Все
+    ),
+    'DEFAULT_RENDERER_CLASSES': [
+        # Настройка рендера для отправки на фронт и получение на бэк в JSON
+        'rest_framework.renderers.JSONRenderer',
+        # для отображения данных в шаблоне rest_framework
+        'rest_framework.renderers.BrowsableAPIRenderer',
+    ],
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
+    'PAGE_SIZE': 2,
+    'DEFAULT_AUTHENTICATION_CLASSES': [ # Аутентификация
+        # 'rest_framework_jwt.authentication.JSONWebTokenAuthentication', # Для JWT регистрации
+        'rest_framework.authentication.TokenAuthentication', # по токену Для Djoser
+        'rest_framework.authentication.BasicAuthentication', # Базовая
+        'rest_framework.authentication.SessionAuthentication' # Для session, например что бы зайти в админку
+    ],
+    # 'DEFAULT_METADATA_CLASS': 'rest_framework_json_api.metadata.JSONAPIMetadata',
+}
+
+# Для вывода ORM запросов в консоль
+LOGGING = {
+    'version': 1,
+    'handlers': {
+        'console': {'class': 'logging.StreamHandler'},
+    },
+    'loggers': {
+        'django.db.backends': {
+            'handlers': ['console'],
+            'level': 'DEBUG'
+            }
+        }
+}
+
 
