@@ -6,6 +6,7 @@ from django.utils.timezone import now
 
 from django.conf import settings
 
+
 class CustomUser(AbstractUser):
     image = models.ImageField(upload_to='user_images', null=True, blank=True)
     is_verified_email = models.BooleanField(default=False) # подтвержденли email

@@ -14,12 +14,42 @@ from pathlib import Path
 
 import os
 
-from dotenv import load_dotenv
+# from dotenv import load_dotenv
+# load_dotenv()
 
-load_dotenv()
+import environ
+
+env = environ.Env(
+    # set casting, default value
+    DEBUG=(bool),
+    SECRET_KEY=(str),
+    DOMAIN_NAME=(str),
+
+    REDIS_HOST=(str),
+    REDIS_PORT=(str),
+
+    DATABASE_NAME=(str),
+    DATABASE_USER=(str),
+    DATABASE_PASSWORD=(str),
+    DATABASE_HOST=(str),
+    DATABASE_PORT=(str),
+
+    EMAIL_HOST=(str),
+    EMAIL_PORT=(int),
+    EMAIL_HOST_USER=(str),
+    EMAIL_HOST_PASSWORD=(str),
+    EMAIL_USE_TLS=(bool),
+    EMAIL_USE_SSL=(bool),
+
+    STRIPE_WEBHOOK_SECRET=(str),
+    STRIPE_PUBLIC_KEY=(str),
+    STRIPE_SECRET_KEY=(str),
+)
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+environ.Env.read_env(BASE_DIR / '.env')
 
 # Users
 AUTH_USER_MODEL = 'users.CustomUser'
@@ -31,14 +61,14 @@ LOGOUT_REDIRECT_URL = '/'
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-izf%i=7&ul(c2e@9xj_cprf@kv#rz7-@nulzieyrr=(=yu+f=y'
+SECRET_KEY = env('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = env('DEBUG')
 
 ALLOWED_HOSTS = []
 
-DOMAIN_NAME = 'http://127.0.0.1:8000'
+DOMAIN_NAME = env('DOMAIN_NAME')
 
 # Application definition
 
@@ -63,6 +93,7 @@ INSTALLED_APPS = [
     'drf_yasg',
     'rest_framework.authtoken',
     'djoser',
+    'django_extensions',
 
 
     'prostoapp',
@@ -120,21 +151,28 @@ WSGI_APPLICATION = 'config.wsgi.application'
 #     }
 # }
 
+# Redis
+
+REDIS_HOST = env('REDIS_HOST')
+REDIS_PORT = env('REDIS_PORT')
+
+# Caches
+
 CACHES = {
     'default': {
         'BACKEND': 'django.core.cache.backends.redis.RedisCache',
-        'LOCATION': 'redis://127.0.0.1:6379',
+        'LOCATION': f'redis://{REDIS_HOST}:{REDIS_PORT}',
     }
 }
 
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'testproject',
-        'USER': 'postgres',
-        'PASSWORD': '1',
-        'HOST': '127.0.0.1',
-        'PORT': '5432',
+        'NAME': env('DATABASE_NAME'),
+        'USER': env('DATABASE_USER'),
+        'PASSWORD': env('DATABASE_PASSWORD'),
+        'HOST': env('DATABASE_HOST'),
+        'PORT': env('DATABASE_PORT'),
     }
 }
 
@@ -182,16 +220,15 @@ MEDIA_ROOT = BASE_DIR / 'media'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# email
-KEY_EMAIL = os.getenv('KEY_EMAIL')
-# print(KEY_EMAIL)
-# EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'  # для отправки в консоль
-EMAIL_HOST = 'smtp.mail.ru'
-EMAIL_PORT = 465
-EMAIL_HOST_USER = 'chausovo@mail.ru'  # Почта отправителя
-EMAIL_HOST_PASSWORD = KEY_EMAIL  # Пароль для внешнего приложения
-EMAIL_USE_TLS = False  # Шифрование TSL
-EMAIL_USE_SSL = True  # Шифрование SSL
+if DEBUG:
+    EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'  # для отправки в консоль
+else:
+    EMAIL_HOST = env('EMAIL_HOST')
+    EMAIL_PORT = env('EMAIL_PORT')
+    EMAIL_HOST_USER = env('EMAIL_HOST_USER')  # Почта отправителя
+    EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD')  # Пароль для внешнего приложения
+    EMAIL_USE_TLS = env('EMAIL_USE_TLS')  # Шифрование TSL
+    EMAIL_USE_SSL = env('EMAIL_USE_SSL')  # Шифрование SSL
 
 # OAuth
 
@@ -221,15 +258,15 @@ INTERNAL_IPS = [
 
 # Celery
 
-CELERY_BROKER_URL = 'redis://127.0.0.1:6379'
-CELERY_RESULT_BACKEND = 'redis://127.0.0.1:6379'
+CELERY_BROKER_URL = f'redis://{REDIS_HOST}:{REDIS_PORT}'
+CELERY_RESULT_BACKEND = f'redis://{REDIS_HOST}:{REDIS_PORT}'
 
 # Stripe
 
-STRIPE_PUBLIC_KEY = os.getenv('STRIPE_PUBLIC_KEY')
-STRIPE_SECRET_KEY = os.getenv('STRIPE_SECRET_KEY')
 # print(STRIPE_SECRET_KEY, STRIPE_PUBLIC_KEY)
-STRIPE_WEBHOOK_SECRET = 'mwhsec_58db2951e44bc78d5e1e3e58a4a739571f13a879af252d10b3a67c61919b81a5'
+STRIPE_WEBHOOK_SECRET = env('STRIPE_WEBHOOK_SECRET')
+STRIPE_PUBLIC_KEY = env('STRIPE_PUBLIC_KEY')
+STRIPE_SECRET_KEY = env('STRIPE_SECRET_KEY')
 
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': ( # Кто имеет доступ

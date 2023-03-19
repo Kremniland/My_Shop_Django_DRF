@@ -8,6 +8,7 @@ from django.utils.timezone import now
 from users.models import CustomUser,EmailVerification
 from users.tasks import send_email_verification
 
+
 class UserLoginForm(AuthenticationForm):
     username = forms.CharField(widget=forms.TextInput(attrs={
         'class': 'form-control py-4', 'placeholder': 'Введите имя пользователя'}))
@@ -36,6 +37,7 @@ class UserRegistrationForm(UserCreationForm):
     def save(self, commit=True):
         '''Создается объект EmailVerification при создании нового пользователя
             и отправляем на него ссылку подтверждения'''
+        # получаем объект пользователя из заполненной формы и сохраняем его
         user = super(UserRegistrationForm, self).save(commit=True)
         # send_email_verification.delay(user.id) # делаем через Celery
         # время жизни ссылки

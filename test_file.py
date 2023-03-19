@@ -1,6 +1,6 @@
 a = {1,2,3,4,5}
-b = {6,7,8,9}
+b = [1,3,4,5]
 
-print(a.union(b))
+print(a.issubset(b))
 print(type(a))
 
